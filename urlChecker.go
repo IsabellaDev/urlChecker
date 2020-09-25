@@ -33,7 +33,7 @@ func checkURL(urls []string) {
 			defer wg.Done()
 
 			client := http.Client{
-				Timeout: 2 * time.Second,
+				Timeout: 10 * time.Second,
 			}
 			//check if the url is reachable or not
 			resp, err := client.Head(v)
@@ -78,7 +78,7 @@ func main() {
 			fmt.Println("  *****  urlChecker Version 0.1  *****  ")
 			return
 		}
-		
+
 		//use for loop to deal with multiple file paths
 		i := 1
 		for i+1 <= len(os.Args) {
@@ -95,7 +95,6 @@ func main() {
 			//call functions to check the availability of each url
 			checkURL(extractURL(textContent))
 		}
-		
 
 	}
 }
