@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"mvdan.cc/xurls/v2"
 )
@@ -30,8 +31,12 @@ func checkURL(urls []string) {
 		//annonymous function to make the wg.Done() work
 		go func(v string) {
 			defer wg.Done()
+
+			client := http.Client{
+				Timeout: 2 * time.Second,
+			}
 			//check if the url is reachable or not
-			resp, err := http.Head(v)
+			resp, err := client.Head(v)
 			//deal with errors
 			if err != nil {
 
