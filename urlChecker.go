@@ -33,7 +33,7 @@ func checkURL(urls []string) {
 			defer wg.Done()
 
 			client := http.Client{
-				Timeout: 10 * time.Second,
+				Timeout: 8 * time.Second,
 			}
 			//check if the url is reachable or not
 			resp, err := client.Head(v)
