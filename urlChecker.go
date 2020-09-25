@@ -103,6 +103,7 @@ func main() {
 			}
 			textContent := string(content)
 
+			fmt.Println()
 			fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			//call functions to check the availability of each url
