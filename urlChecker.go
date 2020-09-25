@@ -19,6 +19,19 @@ func extractURL(str string) []string {
 	return foundUrls
 }
 
+// remove duplicate strings from a slice of strings
+func removeDuplicate(urls []string) []string {
+	result := make([]string, 0, len(urls))
+	temp := map[string]struct{}{}
+	for _, item := range urls {
+		if _, ok := temp[item]; !ok {
+			temp[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
 //check if urls passed reachable or not
 func checkURL(urls []string) {
 
@@ -93,7 +106,9 @@ func main() {
 			fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
 			fmt.Println("--------------------------------------------------------------------------------------------------")
 			//call functions to check the availability of each url
-			checkURL(extractURL(textContent))
+			urls := extractURL(textContent)
+			urls = removeDuplicate(urls)
+			checkURL(urls)
 		}
 
 	}
