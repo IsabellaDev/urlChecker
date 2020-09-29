@@ -75,7 +75,9 @@ func main() {
 		//feature of checking version
 		if os.Args[1] == "-v" || os.Args[1] == "-version" || os.Args[1] == "/v" {
 			fmt.Println("  *****  urlChecker Version 0.1  *****  ")
-		} else if *globFlag {
+		}
+
+		if *globFlag {
 			//Assign the glob pattern provided to a local variable
 			pattern := flag.Args()[0]
 			//Read all files in the current directory
@@ -101,23 +103,23 @@ func main() {
 					checkURL(extractURL(textContent))
 				}
 			}
-		} else {
-			//use for loop to deal with multiple file paths
-			i := 1
-			for i+1 <= len(os.Args) {
-				//open file and read it
-				content, err := ioutil.ReadFile(os.Args[i])
-				i++
-				if err != nil {
-					log.Fatal(err)
-				}
-				textContent := string(content)
+		}
 
-				fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
-				fmt.Println("--------------------------------------------------------------------------------------------------")
-				//call functions to check the availability of each url
-				checkURL(extractURL(textContent))
+		//use for loop to deal with multiple file paths
+		i := 1
+		for i+1 <= len(os.Args) {
+			//open file and read it
+			content, err := ioutil.ReadFile(os.Args[i])
+			i++
+			if err != nil {
+				log.Fatal(err)
 			}
+			textContent := string(content)
+
+			fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
+			fmt.Println("--------------------------------------------------------------------------------------------------")
+			//call functions to check the availability of each url
+			checkURL(extractURL(textContent))
 		}
 
 	}
