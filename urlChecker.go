@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"mvdan.cc/xurls/v2"
 )
@@ -16,6 +17,19 @@ func extractURL(str string) []string {
 	rxStrict := xurls.Strict()
 	foundUrls := rxStrict.FindAllString(str, -1)
 	return foundUrls
+}
+
+// remove duplicate strings from a slice of strings
+func removeDuplicate(urls []string) []string {
+	result := make([]string, 0, len(urls))
+	temp := map[string]struct{}{}
+	for _, item := range urls {
+		if _, ok := temp[item]; !ok {
+			temp[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
 }
 
 //check if urls passed reachable or not
@@ -30,8 +44,12 @@ func checkURL(urls []string) {
 		//annonymous function to make the wg.Done() work
 		go func(v string) {
 			defer wg.Done()
+
+			client := http.Client{
+				Timeout: 8 * time.Second,
+			}
 			//check if the url is reachable or not
-			resp, err := http.Head(v)
+			resp, err := client.Head(v)
 			//deal with errors
 			if err != nil {
 
@@ -71,23 +89,27 @@ func main() {
 		//feature of checking version
 		if string(os.Args[1]) == "-v" || string(os.Args[1]) == "-version" || string(os.Args[1]) == "/v" {
 			fmt.Println("  *****  urlChecker Version 0.1  *****  ")
-		} else {
-			//use for loop to deal with multiple file paths
-			i := 1
-			for i+1 <= len(os.Args) {
-				//open file and read it
-				content, err := ioutil.ReadFile(os.Args[i])
-				i++
-				if err != nil {
-					log.Fatal(err)
-				}
-				textContent := string(content)
+			return
+		}
 
-				fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
-				fmt.Println("--------------------------------------------------------------------------------------------------")
-				//call functions to check the availability of each url
-				checkURL(extractURL(textContent))
+		//use for loop to deal with multiple file paths
+		i := 1
+		for i+1 <= len(os.Args) {
+			//open file and read it
+			content, err := ioutil.ReadFile(os.Args[i])
+			i++
+			if err != nil {
+				log.Fatal(err)
 			}
+			textContent := string(content)
+
+			fmt.Println()
+			fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
+			fmt.Println("--------------------------------------------------------------------------------------------------")
+			//call functions to check the availability of each url
+			urls := extractURL(textContent)
+			urls = removeDuplicate(urls)
+			checkURL(urls)
 		}
 
 	}
