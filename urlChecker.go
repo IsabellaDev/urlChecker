@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/mb0/glob"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -63,14 +65,42 @@ func checkURL(urls []string) {
 }
 
 func main() {
+	globFlag := flag.Bool("g", false, "Glob pattern")
+	flag.Parse()
 	//deal with non-file path, giving usage message
 	if len(os.Args) == 1 {
 		fmt.Println("help/usage message: To run this program, please pass an argument to it,i.e.: go run urlChecker.go urls.txt")
 
 	} else {
 		//feature of checking version
-		if string(os.Args[1]) == "-v" || string(os.Args[1]) == "-version" || string(os.Args[1]) == "/v" {
+		if os.Args[1] == "-v" || os.Args[1] == "-version" || os.Args[1] == "/v" {
 			fmt.Println("  *****  urlChecker Version 0.1  *****  ")
+		} else if *globFlag {
+			//Assign the glob pattern provided to a local variable
+			pattern := flag.Args()[0]
+			//Read all files in the current directory
+			files, _ := ioutil.ReadDir(".")
+			//Create a globber object
+			globber, _ := glob.New(glob.Default())
+			//Loop through all files
+			for _, file := range files {
+				//Check if the file name match the glob pattern provided
+				matched, _ := globber.Match(pattern, file.Name())
+				//If matched then run the url check on that file
+				if matched {
+					//open file and read it
+					content, err := ioutil.ReadFile(file.Name())
+					if err != nil {
+						log.Fatal(err)
+					}
+					textContent := string(content)
+
+					fmt.Println(">>  ***** UrlChecker is working now...... *****  <<")
+					fmt.Println("--------------------------------------------------------------------------------------------------")
+					//call functions to check the availability of each url
+					checkURL(extractURL(textContent))
+				}
+			}
 		} else {
 			//use for loop to deal with multiple file paths
 			i := 1

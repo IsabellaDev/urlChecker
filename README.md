@@ -28,3 +28,11 @@ accessibility of each url.
 - Support for parallelization for the tool to run efficiently
 
 - Only headers are requested when the urls are being checked. 
+- Allows passing glob pattern as an argument
+  ```go
+    ./urlChecker -g [glob-pattern]
+  ```
+  For example,
+  ```go
+    ./urlChecker -g *.txt
+  ```
