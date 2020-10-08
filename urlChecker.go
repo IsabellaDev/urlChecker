@@ -58,24 +58,43 @@ func checkURL(urls []string) {
 				fmt.Println(v + ": NO RESPONCE!")
 			} else {
 
-				//set different colors and reponse according to different status code
-				var (
-					greenC = "\033[1;32m%s\033[0m"
-					redC   = "\033[1;31m%s\033[0m"
-					grayC  = "\033[1;30m%s\033[0m"
-				)
-				switch code := resp.StatusCode; code {
-				case 200:
-					fmt.Printf(greenC, v+": GOOD!\n")
+				//allow environment variables to determine the colors of the output
+				clicolor := os.Getenv("CLICOLOR")
 
-				case 400, 404:
-					fmt.Printf(redC, v+": BAD!\n")
+				if clicolor == "1" {
 
-				default:
-					fmt.Printf(grayC, v+": UNKNOWN!\n")
+					//set different colors and reponse according to different status code
+					var (
+						greenC = "\033[1;32m%s\033[0m"
+						redC   = "\033[1;31m%s\033[0m"
+						grayC  = "\033[1;30m%s\033[0m"
+					)
+					switch code := resp.StatusCode; code {
+					case 200:
+						fmt.Printf(greenC, v+": GOOD!\n")
+
+					case 400, 404:
+						fmt.Printf(redC, v+": BAD!\n")
+
+					default:
+						fmt.Printf(grayC, v+": UNKNOWN!\n")
+
+					}
+				} else {
+					switch code := resp.StatusCode; code {
+					case 200:
+						fmt.Println(v + ": GOOD!")
+
+					case 400, 404:
+						fmt.Println(v + ": BAD!")
+
+					default:
+						fmt.Println(v + ": UNKNOWN!")
+					}
 
 				}
 			}
+
 		}(v)
 	}
 
