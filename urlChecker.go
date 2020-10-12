@@ -93,7 +93,7 @@ type UrlJson struct {
 
 //if json output required, check urls and output json
 func checkURLJson(urls []string) {
-	fmt.Println("check urls json output") //*****
+
 	//use multi-threads to make the process execute faster
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
@@ -118,14 +118,12 @@ func checkURLJson(urls []string) {
 				urlsJ = append(urlsJ, j)
 			} else {
 				u := UrlJson{v, resp.StatusCode}
-				//j, _ := json.Marshal(u)
-				//fmt.Println(string(j)) //****
 				urlsJ = append(urlsJ, u)
 
 			}
 		}(v)
-		fmt.Println(urlsJ)
 	}
+	wg.Wait()
 
 	urlsInJson, err := json.Marshal(urlsJ)
 	if err != nil {
@@ -133,8 +131,6 @@ func checkURLJson(urls []string) {
 	}
 	//fmt.Println(urlsInJson)
 	os.Stdout.WriteString(string(urlsInJson))
-
-	wg.Wait()
 
 }
 
