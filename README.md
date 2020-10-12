@@ -28,16 +28,21 @@ accessibility of each url.
 - Support for parallelization for the tool to run efficiently
 
 - Only headers are requested when the urls are being checked. 
+
 - Allows passing glob pattern as an argument
-  ```go run urlChecker.go -g [glob-pattern]
+  ```
+  go run urlChecker.go -g [glob-pattern]
   ```
   For example,
-  ```go run urlChecker.go -g *.txt
+  ```
+  go run urlChecker.go -g *.txt
   ```
 
 - Allows passing -j, --json flag, which causes the program to output JSON. The JSON output should look like [ { "url": 'https://www.google.com', "status": 200 }, { "url": 'https://bad-link.com', "status": 404 } ], and allows output be piped into a file, eg.: output.txt
 
-```go run urlChecker.go test/urls2.txt -j
-```
-```go run urlChecker.go test/urls2.txt --json > output.txt
-```
+  ```
+  go run urlChecker.go test/urls2.txt -j
+  ```
+  ```
+  go run urlChecker.go test/urls2.txt --json > output.txt
+  ```
