@@ -132,7 +132,6 @@ func checkURLJson(urls []string) {
 			//deal with errors
 			if err != nil {
 
-				//fmt.Println(v + ": NO RESPONCE!")
 				j := UrlJson{v, -1}
 				urlsJ = append(urlsJ, j)
 			} else {
@@ -222,7 +221,7 @@ func main() {
 
 				//check if there are flags for JSON output or not
 				if *jflag {
-					//urlsJ := make([]UrlJson, 0)
+
 					checkURLJson(urls)
 				} else {
 

@@ -3,7 +3,7 @@
 Go implementation of the url checking
 
 # Versioning
-This is the 0.1 version of this tool. 
+This is the 0.2 version of this tool. 
 
 # Usage
 
@@ -11,8 +11,8 @@ This is the 0.1 version of this tool.
 git clone https://github.com/isabellaliu77/urlChecker.git
 
 cd urlchecker
-go run urlChecker.go urls.txt
-go run urlChecker.go urls.txt urls2.txt
+go run urlChecker.go test/urls.txt
+go run urlChecker.go test/urls.txt test/urls2.txt
 ```
 
 # Features
@@ -29,10 +29,15 @@ accessibility of each url.
 
 - Only headers are requested when the urls are being checked. 
 - Allows passing glob pattern as an argument
-  ```go
-    ./urlChecker -g [glob-pattern]
+  ```go run urlChecker.go -g [glob-pattern]
   ```
   For example,
-  ```go
-    ./urlChecker -g *.txt
+  ```go run urlChecker.go -g *.txt
   ```
+
+- Allows passing -j, --json flag, which causes the program to output JSON. The JSON output should look like [ { "url": 'https://www.google.com', "status": 200 }, { "url": 'https://bad-link.com', "status": 404 } ], and allows output be piped into a file, eg.: output.txt
+
+```go run urlChecker.go test/urls2.txt -j
+```
+```go run urlChecker.go test/urls2.txt --json > output.txt
+```
