@@ -2,12 +2,15 @@ package main
 
 import (
 	//"flag"
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -23,6 +26,35 @@ func extractURL(str string) []string {
 	return foundUrls
 }
 
+//Function to parse ignore URLs from provided ignore file path
+func parseIgnoreURL(ignoreFilePath string) []string {
+	ignoreURLs := []string{}
+	//Read the content of file given by ignoreFilePath
+	content, readErr := ioutil.ReadFile(ignoreFilePath)
+	if readErr != nil {
+		log.Fatal(readErr)
+	}
+	//Create a scanner for file content
+	scanner := bufio.NewScanner(strings.NewReader(string(content)))
+	//Scan the ignore URL file line by line
+	for scanner.Scan() {
+		line := scanner.Text()
+		firstChar := string(line[0])
+		//Only look at lines that don't start with #
+		if firstChar != "#" {
+			URLsFoundFromLine := extractURL(line)
+			ignoreURLs = append(ignoreURLs, URLsFoundFromLine...)
+		}
+	}
+
+	//If there is error during scan, log the error
+	if scanErr := scanner.Err(); scanErr != nil {
+		log.Fatal(scanErr)
+	}
+
+	return ignoreURLs
+}
+
 // remove duplicate strings from a slice of strings
 func removeDuplicate(urls []string) []string {
 	result := make([]string, 0, len(urls))
@@ -34,6 +66,23 @@ func removeDuplicate(urls []string) []string {
 		}
 	}
 	return result
+}
+
+func parseUniqueURLsFromFile(filepath string) []string {
+	//open file and read it
+	content, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	textContent := string(content)
+
+	//call functions to check the availability of each url
+	return removeDuplicate(extractURL(textContent))
+}
+
+func removeLinkFromList(s []string, i int) []string {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
 }
 
 //check if urls passed reachable or not
@@ -161,6 +210,9 @@ func main() {
 	// checking version flag
 	vflag := flag.BoolP("version", "v", false, "version check")
 
+	// ignore url flag
+	ignoreFlag := flag.BoolP("ignore", "i", false, "ignore url patterns")
+
 	flag.Parse()
 	//deal with non-file path, giving usage message
 	if len(os.Args) == 1 {
@@ -202,6 +254,53 @@ func main() {
 			return
 		}
 
+		if *ignoreFlag {
+			combineStrIgnorePatterns := ""
+			ignoreFilePath := flag.Args()[0]
+
+			ignoreList := parseIgnoreURL(ignoreFilePath)
+
+			filepath := flag.Arg(1)
+
+			//If the user did not provide a second arg, exit with status code 1
+			if filepath == "" {
+				fmt.Println("A filepath as a second arg is required")
+				os.Exit(1)
+			}
+
+			//Extract the URLs from filepath provided
+			URLList := parseUniqueURLsFromFile(filepath)
+
+			//If there are links to ignore, then filter them out from URLs list extracted above, else check regularly
+			if len(ignoreList) != 0 {
+				URLListWithoutIgnores := []string{}
+				for index, pattern := range ignoreList {
+					if index != len(ignoreList)-1 {
+						combineStrIgnorePatterns += pattern + "|"
+					} else {
+						combineStrIgnorePatterns += pattern
+					}
+				}
+
+				//Create regex object to match any ignore links in list
+				re := regexp.MustCompile("^(" + combineStrIgnorePatterns + ")")
+
+				//Filter out the ignored links
+				for _, link := range URLList {
+					if !re.Match([]byte(link)) {
+						URLListWithoutIgnores = append(URLListWithoutIgnores, link)
+					}
+				}
+
+				//Check with URL List that has no ignored links
+				checkURL(URLListWithoutIgnores)
+			} else {
+				//Check regularly if there is nothing to ignore
+				checkURL(URLList)
+			}
+			return
+		}
+
 		//use for loop to deal with multiple file paths
 		i := 1
 		for i+1 <= len(os.Args) {
@@ -209,15 +308,8 @@ func main() {
 			var urls []string
 			if os.Args[i][0] != '-' {
 
-				//open file and read it
-				content, err := ioutil.ReadFile(os.Args[i])
-				if err != nil {
-					log.Fatal(err)
-				}
-				textContent := string(content)
-
 				//call functions to check the availability of each url
-				urls = removeDuplicate(extractURL(textContent))
+				urls = parseUniqueURLsFromFile(os.Args[i])
 
 				//check if there are flags for JSON output or not
 				if *jflag {
