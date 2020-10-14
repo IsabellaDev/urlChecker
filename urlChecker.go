@@ -169,7 +169,7 @@ func main() {
 	} else {
 		//feature of checking version
 		if *vflag {
-			fmt.Println("  *****  urlChecker Version 0.1  *****  ")
+			fmt.Println("  *****  urlChecker Version 0.2  *****  ")
 			return
 		}
 
