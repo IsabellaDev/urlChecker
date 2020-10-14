@@ -55,3 +55,9 @@ accessibility of each url.
   ```
   go run urlChecker.go -i ignore-file.txt index.html
   ```
+
+- Allows passing -i, --ignore flags to provide options to ignore links inside the file after the flags, for examaple: 
+
+  ```
+  go run urlCheck.go --ignore test/ignoreUrl.txt test/urls2.txt
+  ```
