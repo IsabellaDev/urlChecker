@@ -36,10 +36,20 @@ func parseIgnoreURL(ignoreFilePath string) []string {
 	}
 	//Create a scanner for file content
 	scanner := bufio.NewScanner(strings.NewReader(string(content)))
+	re := regexp.MustCompile("^(#|https?://)")
 	//Scan the ignore URL file line by line
 	for scanner.Scan() {
 		line := scanner.Text()
+
+		//Check if the ignore link file is invalid
+		if !re.Match([]byte(line)) {
+			fmt.Println("Ignore Link File is invalid")
+			fmt.Println("Exit with status 1")
+			os.Exit(1)
+		}
+
 		firstChar := string(line[0])
+
 		//Only look at lines that don't start with #
 		if firstChar != "#" {
 			URLsFoundFromLine := extractURL(line)
