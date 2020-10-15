@@ -47,15 +47,6 @@ accessibility of each url.
   go run urlChecker.go test/urls2.txt --json > output.txt
   ```
 
-- Allows passing --ignore, -i flag, which ignores any valid URL parsed from ignore filepath
-  ```
-  go run urlChecker.go -i [ignore-filepath] [url-check-filepath]
-  ```
-  For example,
-  ```
-  go run urlChecker.go -i ignore-file.txt index.html
-  ```
-
 - Allows passing -i, --ignore flags to provide options to ignore links inside the file after the flags, for examaple: 
 
   ```
