@@ -124,6 +124,18 @@ func parseUniqueURLsFromFile(filepath string) []string {
 	return removeDuplicate(extractURL(textContent))
 }
 
+// get the status code from a link.
+func getStatusCode(link string) (int, error) {
+	client := http.Client{
+		Timeout: 8 * time.Second,
+	}
+	resp, err := client.Head(link)
+	if err != nil {
+		return -1, err
+	}
+	return resp.StatusCode, nil
+}
+
 //check if urls passed reachable or not
 func checkURL(urls []string) {
 
@@ -137,11 +149,7 @@ func checkURL(urls []string) {
 		go func(v string) {
 			defer wg.Done()
 
-			client := http.Client{
-				Timeout: 8 * time.Second,
-			}
-			//check if the url is reachable or not
-			resp, err := client.Head(v)
+			statusCode, err := getStatusCode(v)
 			//deal with errors
 			if err != nil {
 
@@ -159,7 +167,7 @@ func checkURL(urls []string) {
 						redC   = "\033[1;31m%s\033[0m"
 						grayC  = "\033[1;30m%s\033[0m"
 					)
-					switch code := resp.StatusCode; code {
+					switch statusCode {
 					case 200:
 						fmt.Printf(greenC, v+": GOOD!\n")
 
@@ -171,7 +179,7 @@ func checkURL(urls []string) {
 
 					}
 				} else {
-					switch code := resp.StatusCode; code {
+					switch statusCode {
 					case 200:
 						fmt.Println(v + ": GOOD!")
 
