@@ -30,3 +30,11 @@ gofmt -w filename.go
 Please use the command below to check linters before sending any PR: 
 ``
 golint filename.go
+
+## Testing
+
+To test the program `go test -v`
+
+## Code coverage
+
+To check the code coverage ` go test -cover`
