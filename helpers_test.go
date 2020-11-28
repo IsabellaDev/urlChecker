@@ -51,3 +51,21 @@ func Test400GetStatusCode(t *testing.T) {
 		t.Errorf("Expected: %v, but got: %v", expected, result)
 	}
 }
+
+func Test404GetStatusCode(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+		w.Write([]byte("Not Found"))
+	}))
+	defer ts.Close()
+	link := ts.URL
+	result, err := getStatusCode(link)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	expected := 404
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected: %v, but got: %v", expected, result)
+	}
+}
