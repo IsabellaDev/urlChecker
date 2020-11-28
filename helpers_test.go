@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 )
@@ -14,6 +17,37 @@ func TestExtractURL(t *testing.T) {
 	}
 }
 
-func TestParseFromTelescope(t *testing.T) {
+func TestGetStatusCode(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Write([]byte("Ok"))
+	}))
+	defer ts.Close()
+	link := ts.URL
+	result, err := getStatusCode(link)
+	if err != nil {
+		fmt.Println(err)
+	}
 
+	expected := 200
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected: %v, but got: %v", expected, result)
+	}
+}
+func Test400GetStatusCode(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(400)
+		w.Write([]byte("Not Found"))
+	}))
+	defer ts.Close()
+	link := ts.URL
+	result, err := getStatusCode(link)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	expected := 400
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected: %v, but got: %v", expected, result)
+	}
 }
