@@ -69,3 +69,26 @@ func Test404GetStatusCode(t *testing.T) {
 		t.Errorf("Expected: %v, but got: %v", expected, result)
 	}
 }
+
+func Test_removeDuplicate(t *testing.T) {
+	type args struct {
+		urls []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		// TODO: Add test cases.
+		{"name", args{[]string{"http://www.google.ca", "http://www.google.ca"}}, []string{"http://www.google.ca"}},
+		{"name", args{[]string{"http://www.google.ca", "http://zyang.ca", "http://www.google.ca"}}, []string{"http://www.google.ca", "http://zyang.ca"}},
+		{"name", args{[]string{}}, []string{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := removeDuplicate(tt.args.urls); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("removeDuplicate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
