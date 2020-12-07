@@ -1,4 +1,4 @@
-module tmp
+module github.com/isabellaliu77/urlChecker
 
 go 1.15
 
